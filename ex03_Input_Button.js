@@ -18,7 +18,7 @@ function setup() {
   button.position(input.x + input.width, 65);
   button.mousePressed(greet);
 
-  greeting = createElement('h2', 'what is your name?');
+  greeting = createElement('h2', 'Нихуя себе, работает');
   greeting.position(20, 5);
 
   textAlign(CENTER);
