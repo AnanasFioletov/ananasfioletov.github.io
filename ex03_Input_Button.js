@@ -1,41 +1,60 @@
-/*
- * @name Input and Button
- * @description You will need to include the
- * <a href="http://p5js.org/reference/#/libraries/p5.dom">p5.dom library</a>
- * for this example to work in your own project.<br><br>
- * Input text and click the button to see it affect the the canvas.
- */
-let input, button, greeting;
+var clouds;
+var ghosts;
+var asterisk;
 
 function setup() {
-  // create canvas
-  createCanvas(710, 400);
+  createCanvas(800, 400);
 
-  input = createInput();
-  input.position(20, 65);
+  //in games you often have many sprites having similar properties behaviors
+  //(e.g. pills and ghosts in pacMan)
+  //You can use groups to organize and access them without having many global
+  //variables. A sprite can belong to multiple groups.
 
-  button = createButton('submit');
-  button.position(input.x + input.width, 65);
-  button.mousePressed(greet);
+  //create empty groups
+  ghosts = new Group();
+  clouds = new Group();
 
-  greeting = createElement('h2', 'Нихуя себе, работает');
-  greeting.position(20, 5);
+  asterisk = createSprite(random(0, width), random(0, height));
+  asterisk.addAnimation('floating', 'assets/asterisk_normal0001.png', 'assets/asterisk_normal0003.png');
 
-  textAlign(CENTER);
-  textSize(50);
+  //assign new sprites to the respective groups
+  for(var i = 0; i<6; i++) {
+    var newGhost = createSprite(random(0, width), random(0, height));
+    newGhost.addAnimation('floating', 'assets/ghost_standing0001.png', 'assets/ghost_standing0007.png');
+    ghosts.add(newGhost);
+  }
+
+  for(var j = 0; j<6; j++) {
+    var newCloud = createSprite(random(0, width), random(0, height));
+    newCloud.addAnimation('floating', 'assets/cloud_pulsing0001.png', 'assets/cloud_pulsing0007.png');
+    //set a rotation speed
+    newCloud.rotationSpeed = -2;
+    //another way to add a sprite to a group
+    newCloud.addToGroup(clouds);
+  }
 }
 
-function greet() {
-  const name = input.value();
-  greeting.html('hello ' + name + '!');
-  input.value('');
+function draw() {
+  background(255, 255, 255);
 
-  for (let i = 0; i < 200; i++) {
-    push();
-    fill(random(255), 255, 255);
-    translate(random(width), random(height));
-    rotate(random(2 * PI));
-    text(name, 0, 0);
-    pop();
+  //a group can be accessed like an array
+  //the removed objects will be automatically removed from the groups as well
+  for(var i = 0; i<ghosts.length; i++) {
+    var g = ghosts[i];
+    //moving all the ghosts y following a sin function (sinusoid)
+    g.position.y += sin(frameCount/10);
   }
+
+  asterisk.position.x = mouseX;
+  asterisk.position.y = mouseY;
+
+  //instead of drawing all sprites with drawSprites();
+  //you can draw them selectively by group or single instance
+  //in the order you want
+
+  //e.g. even if the clouds should appear on the top of the ghosts
+  //I impose a rendering before the others sprites
+  drawSprites(clouds);
+  drawSprites(ghosts);
+  drawSprite(asterisk);
 }
